@@ -16,11 +16,18 @@ let package = Package(
         ),
     ],
     dependencies: [
-        
+        .package(url: "https://github.com/vapor/console-kit.git", from: "4.4.1"),
     ],
     targets: [
         .target(
             name: "KeychainWrapper"
+        ),
+        .executableTarget(
+            name: "App",
+            dependencies: [
+                "KeychainWrapper",
+                .product(name: "ConsoleKit", package: "console-kit"),
+            ]
         ),
         .testTarget(
             name: "KeychainWrapperTests",

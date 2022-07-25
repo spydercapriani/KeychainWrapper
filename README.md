@@ -21,7 +21,6 @@ var gitHubPassword: String?
 To update account, use the `projectedValue` to access the wrapper value.
 
 ```swift
-print($gitHubPassword.account) // accesses the account field for the keychain item.
 $gitHub.account = "newAccount" // Updates the account field for the keychain item.
 ```
 

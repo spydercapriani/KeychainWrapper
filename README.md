@@ -1,6 +1,6 @@
 # KeychainWrapper
 
-A wrapper for interacting with the Keychain.
+A library of wrappers / utilities for interacting with the Keychain.
 
 ## Property Wrappers
 

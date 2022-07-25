@@ -26,7 +26,7 @@ $gitHub.account = "newAccount" // Updates the account field for the keychain ite
 
 ## Keychain
 
-Perform *CRUD* operation with the keychain via *QUERIES*.
+Perform *CRUD* operation with the keychain via *KeychainQuery*'s.
 
 *Useful for creating future property wrappers*
 

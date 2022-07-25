@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension CFString {
+public extension CFString {
     
     var string: String {
         self as String

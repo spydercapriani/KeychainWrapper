@@ -6,13 +6,26 @@ A library of wrappers / utilities for interacting with the Keychain.
 
 ### SecureCredentials
 
-Wrapper for generic password item in the keychain. Fetches
+Wrapper for generic password item in the keychain.
 
 ```swift
 @SecureCredentials(
     label: "GitHub Token",              // Optional
     service: "github.token",            // Required
     account: "user@github.com"          // Optional
+)
+var gitHubPassword: String?
+```
+
+### InternetCredentials
+
+Wrapper for Internet password items in the keychain.
+
+```swift
+@InternetCredentials(
+    label: "GitHub Token",                          // Optional
+    server: URL(string: "https://www.github.com",   // Required
+    account: "user@github.com"                      // Optional
 )
 var gitHubPassword: String?
 ```

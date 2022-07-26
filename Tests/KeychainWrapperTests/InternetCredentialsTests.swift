@@ -12,7 +12,7 @@ class InternetCredentialsTests: XCTestCase {
 
     @InternetCredentials(
         label: "InternetCredentialsTest",
-        server: URL(string: "https://www.test.com")!,
+        server: "www.test.com",
         account: "Test User"
     )
     var testSubject: String?

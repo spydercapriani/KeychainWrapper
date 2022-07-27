@@ -7,14 +7,15 @@
 
 import Foundation
 
-public typealias KeychainAttributes = [String: Any]
 public typealias KeychainQuery = [String: Any]
-public typealias KeychainOptions = [String: Any]
 public typealias KeychainItem = [String: Any]
+public typealias KeychainAttributes = Set<KeychainAttribute>
+public typealias KeychainOptions = Set<KeychainOption>
 
 public struct Keychain {
     
-    public static func read(_ query: KeychainQuery, options: KeychainOptions) throws -> KeychainItem {
+    @available(*, renamed: "search", message: "Consider conforming to KeychainQueryable")
+    public static func read(_ query: [String: Any], options: [String: Any]) throws -> KeychainItem {
         let searchQuery = query
             .merging(options, uniquingKeysWith: { $1 })
         
@@ -39,7 +40,8 @@ public struct Keychain {
         return item
     }
     
-    public static func update(_ attributes: KeychainAttributes, using query: KeychainQuery) throws {
+    @available(*, renamed: "modify", message: "Consider conforming to KeychainQueryable")
+    public static func update(_ attributes: [String: Any], using query: [String: Any]) throws {
         var status = SecItemUpdate(
             query as CFDictionary,
             attributes as CFDictionary
@@ -57,7 +59,8 @@ public struct Keychain {
         }
     }
     
-    public static func delete(_ query: KeychainQuery) throws {
+    @available(*, renamed: "remove", message: "Consider conforming to KeychainQueryable")
+    public static func delete(_ query: [String: Any]) throws {
         let status = SecItemDelete(query as CFDictionary)
         
         let successCodes: [OSStatus] = [
@@ -68,5 +71,38 @@ public struct Keychain {
         guard successCodes.contains(status) else {
             throw KeychainError.unhandledException(status: status, msg: "deleting")
         }
+    }
+}
+
+// MARK: - Keychain Attribute Convenience Actions
+public extension Keychain {
+    
+    static func search(for attributes: KeychainAttributes, with options: KeychainOptions) throws -> KeychainItem {
+        try read(attributes.query, options: options.query)
+    }
+    
+    static func modify(_ attributes: KeychainAttributes, for existingAttributes: KeychainAttributes) throws {
+        try update(attributes.query, using: existingAttributes.query)
+    }
+    
+    static func remove(_ attributes: KeychainAttributes) throws {
+        try delete(attributes.query)
+    }
+}
+
+
+// MARK: - KeychainQueryable Convenience Actions
+public extension Keychain {
+    
+    static func search(for queryable: KeychainQueryable) throws -> KeychainItem {
+        try search(for: queryable.attributes, with: queryable.options)
+    }
+    
+    static func modify(_ attributes: KeychainAttributes, for queryable: KeychainQueryable) throws {
+        try modify(attributes, for: queryable.attributes)
+    }
+    
+    static func remove(_ queryable: KeychainQueryable) throws {
+        try remove(queryable.attributes)
     }
 }

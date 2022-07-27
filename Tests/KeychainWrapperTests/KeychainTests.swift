@@ -15,7 +15,7 @@ class KeychainTests: XCTestCase {
         kSecAttrService.string: "keychain.wrapper.test.service"
     ]
     
-    let search: KeychainOptions = [
+    let search: [String: Any] = [
         kSecReturnAttributes.string: true,
         kSecReturnData.string: true,
         kSecMatchLimit.string: kSecMatchLimitOne
@@ -34,7 +34,7 @@ class KeychainTests: XCTestCase {
         let password = "password"
         
         // MARK: - Writing Items
-        var attributes: KeychainAttributes = [
+        var attributes: [String: Any] = [
             kSecAttrAccount.string: account,
             kSecValueData.string: Data(password.utf8)
         ]

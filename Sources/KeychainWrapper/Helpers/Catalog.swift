@@ -1,5 +1,5 @@
 //
-//  KeychainCatalog.swift
+//  Catalog.swift
 //  
 //
 //  Created by Danny Gilbert on 7/26/22.
@@ -7,15 +7,15 @@
 
 import Foundation
 
-public struct KeychainCatalog {
+struct Catalog {
 
-    public enum Global {
-        case kind(Kind)
+    enum Global {
+        case kind(KeychainKind)
         case account(String)
         case password(Data)
     }
 
-    public enum Internet {
+    enum Internet {
         case server(String)
         case securityDomain(String)
         case port(Int)
@@ -24,13 +24,13 @@ public struct KeychainCatalog {
         case `protocol`(InternetProtocol)
     }
 
-    public enum Application {
+    enum Application {
         case service(String)
         case accessControl(String)  // This attribute is mutually exclusive with the kSecAttrAccess attribute.
         case generic(Data)
     }
 
-    public enum Entry {
+    enum Entry {
         /// Read-only
         case creationDate
         case modificationDate
@@ -46,34 +46,10 @@ public struct KeychainCatalog {
     }
 }
 
-// MARK: - Kind
-extension KeychainCatalog {
-    
-    public enum Kind: String {
-        case internet
-        case application
-        case certificate
-        case key
-        
-        public var rawValue: String {
-            switch self {
-            case .internet: return kSecClassInternetPassword.string
-            case .application: return kSecClassGenericPassword.string
-            case .certificate: return kSecClassCertificate.string
-            case .key: return kSecClassKey.string
-            }
-        }
-    }
-}
+// MARK: - Global - Keychain Attributable
+extension Catalog.Global: KeychainAttributable {
 
-// MARK: - Global - Keychain Attribute
-extension KeychainCatalog.Global {
-    
-    public var attribute: KeychainAttribute {
-        KeychainAttribute(key: key, value: value)
-    }
-
-    public var key: String {
+    var key: String {
         switch self {
         case .kind: return kSecClass.string
         case .account: return kSecAttrAccount.string
@@ -81,7 +57,7 @@ extension KeychainCatalog.Global {
         }
     }
 
-    public var value: Any {
+    var value: Any {
         switch self {
         case .kind(let kind):
             return kind.rawValue
@@ -95,14 +71,10 @@ extension KeychainCatalog.Global {
     }
 }
 
-// MARK: - Internet - Keychain Attribute
-extension KeychainCatalog.Internet {
-    
-    public var attribute: KeychainAttribute {
-        KeychainAttribute(key: key, value: value)
-    }
+// MARK: - Internet - Keychain Attributable
+extension Catalog.Internet: KeychainAttributable {
 
-    public var key: String {
+    var key: String {
         switch self {
         case .server:           return kSecAttrServer.string
         case .securityDomain:   return kSecAttrSecurityDomain.string
@@ -113,7 +85,7 @@ extension KeychainCatalog.Internet {
         }
     }
 
-    public var value: Any {
+    var value: Any {
         switch self {
         case .server(let string),
             .securityDomain(let string),
@@ -132,43 +104,10 @@ extension KeychainCatalog.Internet {
     }
 }
 
-// MARK: - Internet - Authentication Types
-extension KeychainCatalog.Internet {
+// MARK: - Application - Keychain Attributable
+extension Catalog.Application: KeychainAttributable {
 
-    public enum AuthenticationType: String {
-        case ntlm
-        case msn
-        case dpa
-        case rpa
-        case httpBasic
-        case httpDigest
-        case htmlForm
-        case `default`
-
-        public var rawValue: String {
-            switch self {
-            case .ntlm:         return kSecAttrAuthenticationTypeNTLM.string
-            case .msn:          return kSecAttrAuthenticationTypeMSN.string
-            case .dpa:          return kSecAttrAuthenticationTypeDPA.string
-            case .rpa:          return kSecAttrAuthenticationTypeRPA.string
-            case .httpBasic:    return kSecAttrAuthenticationTypeHTTPBasic.string
-            case .httpDigest:   return kSecAttrAuthenticationTypeHTTPDigest.string
-            case .htmlForm:     return kSecAttrAuthenticationTypeHTMLForm.string
-
-            default:            return kSecAttrAuthenticationTypeDefault.string
-            }
-        }
-    }
-}
-
-// MARK: - Application - Keychain Attribute
-extension KeychainCatalog.Application {
-    
-    public var attribute: KeychainAttribute {
-        KeychainAttribute(key: key, value: value)
-    }
-
-    public var key: String {
+    var key: String {
         switch self {
         case .service:          return kSecAttrService.string
         case .accessControl:    return kSecAttrAccessControl.string
@@ -176,7 +115,7 @@ extension KeychainCatalog.Application {
         }
     }
 
-    public var value: Any {
+    var value: Any {
         switch self {
         case .service(let string),
             .accessControl(let string):
@@ -188,14 +127,10 @@ extension KeychainCatalog.Application {
     }
 }
 
-// MARK: - Entry - Keychain Attribute
-extension KeychainCatalog.Entry {
-    
-    public var attribute: KeychainAttribute {
-        KeychainAttribute(key: key, value: value)
-    }
+// MARK: - Entry - Keychain Attributable
+extension Catalog.Entry: KeychainAttributable {
 
-    public var key: String {
+    var key: String {
         switch self {
         case .creationDate:         return kSecAttrCreationDate.string
         case .modificationDate:     return kSecAttrModificationDate.string
@@ -210,7 +145,7 @@ extension KeychainCatalog.Entry {
         }
     }
 
-    public var value: Any {
+    var value: Any {
         switch self {
 
         case .creationDate,

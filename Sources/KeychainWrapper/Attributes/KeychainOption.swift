@@ -20,32 +20,7 @@ public struct KeychainOption {
     }
 }
 
-// MARK: - Built-In Options
-public extension KeychainOption {
-    
-    static func returnAttributes(_ value: Bool) -> KeychainOption {
-        KeychainOption(
-            key: kSecReturnAttributes.string,
-            value: value
-        )
-    }
-    
-    static func returnData(_ value: Bool) -> KeychainOption {
-        KeychainOption(
-            key: kSecReturnData.string,
-            value: value
-        )
-    }
-    
-    static func matchLimit(_ option: MatchLimit) -> KeychainOption {
-        KeychainOption(
-            key: kSecMatchLimit.string,
-            value: option.rawValue
-        )
-    }
-}
-
-// MARK: - Keychain Options - Match Limit
+// MARK: - Match Limit
 extension KeychainOption {
     
     public enum MatchLimit: String {
@@ -73,6 +48,7 @@ extension KeychainOption: Hashable {
     }
 }
 
+// MARK: - Query
 public extension Set where Element == KeychainOption {
     
     var query: KeychainQuery {
@@ -80,6 +56,10 @@ public extension Set where Element == KeychainOption {
             result[option.key] = option.value
         }
     }
+}
+
+// MARK: - Predefined Options
+public extension Set where Element == KeychainOption {
     
     static var matchFirst: Set<KeychainOption> {
         [
@@ -95,5 +75,30 @@ public extension Set where Element == KeychainOption {
             .returnAttributes(true),
             .matchLimit(.all)
         ]
+    }
+}
+
+// MARK: - Built-In Options
+public extension KeychainOption {
+    
+    static func returnAttributes(_ value: Bool) -> KeychainOption {
+        KeychainOption(
+            key: kSecReturnAttributes.string,
+            value: value
+        )
+    }
+    
+    static func returnData(_ value: Bool) -> KeychainOption {
+        KeychainOption(
+            key: kSecReturnData.string,
+            value: value
+        )
+    }
+    
+    static func matchLimit(_ option: MatchLimit) -> KeychainOption {
+        KeychainOption(
+            key: kSecMatchLimit.string,
+            value: option.rawValue
+        )
     }
 }

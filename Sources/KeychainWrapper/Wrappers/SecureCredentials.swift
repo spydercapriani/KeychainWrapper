@@ -19,13 +19,8 @@ public class SecureCredentials {
     public var account: String? {
         get { _account }
         set {
-            let attribute: KeychainAttribute = .init(
-                key: kSecAttrAccount.string,
-                value: newValue ?? ""
-            )
-            
             do {
-                try update(attribute)
+                try update(.account(newValue ?? ""))
                 _account = newValue
             } catch {
                 fatalError(error.localizedDescription)
@@ -60,13 +55,9 @@ public class SecureCredentials {
                 }
                 return
             }
-            let attribute: KeychainAttribute = .init(
-                key: kSecValueData.string,
-                value: Data(newPassword.utf8)
-            )
             
             do {
-                try update(attribute)
+                try update(.password(Data(newPassword.utf8)))
             } catch {
                 fatalError(error.localizedDescription)
             }
@@ -94,8 +85,8 @@ public class SecureCredentials {
 // MARK: - Keychain Queryable
 extension SecureCredentials: KeychainQueryable {
     
-    public var attributes: Set<KeychainAttribute> {
-        var attributes: Set<KeychainAttribute> = [
+    public var attributes: KeychainAttributes {
+        var attributes: KeychainAttributes = [
             .kind(.application),
             .label(label),
             .service(service)

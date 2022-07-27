@@ -9,10 +9,11 @@ import Foundation
 
 public protocol KeychainQueryable {
     
-    var attributes: Set<KeychainAttribute> { get }
-    var options: Set<KeychainOption> { get }
+    var attributes: KeychainAttributes { get }
+    var options: KeychainOptions { get }
 }
 
+// MARK: - CRUD Keychain Actions
 public extension KeychainQueryable {
     
     var item: KeychainItem {

@@ -10,7 +10,7 @@ import Foundation
 @propertyWrapper
 public class SecureCredentials {
     
-    public let options: Set<KeychainOption>
+    public let options: KeychainOptions
     
     public let label: String
     public let service: String

@@ -30,8 +30,19 @@ Wrapper for Internet password items in the keychain.
 var gitHubPassword: String?
 ```
 
+### SecureItem
+
+Wrapper for codable items in the keychain.
+
+```swift
+@SecureItem(
+    name: "Keychain Item Name"
+)
+var item: Codable?
+```
+
 ** Advanced Tips **
-To update account, use the `projectedValue` to access the wrapper value.
+To update `account` for wrappers, use the `projectedValue` like so:
 
 ```swift
 $gitHub.account = "newAccount" // Updates the account field for the keychain item.

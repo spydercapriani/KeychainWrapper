@@ -1,28 +1,27 @@
 //
-//  SecureCredentials.swift
+//  InternetCredentials.swift
 //  
 //
-//  Created by Danny Gilbert on 7/22/22.
+//  Created by Danny Gilbert on 7/26/22.
 //
 
 import Foundation
 
 @propertyWrapper
-public class SecureCredentials {
+public class InternetCredentials {
+    
+    public let options: Set<KeychainOption>
     
     public let label: String
-    public let service: String
+    public let server: String
+    public let `protocol`: InternetProtocol
     
     private var _account: String?
     public var account: String? {
         get { _account }
         set {
-            let attribute: KeychainAttributes = [
-                kSecAttrAccount.string: newValue ?? ""
-            ]
-
             do {
-                try Keychain.update(attribute, using: query)
+                try update(.account(newValue ?? ""))
                 _account = newValue
             } catch {
                 fatalError(error.localizedDescription)
@@ -33,9 +32,8 @@ public class SecureCredentials {
     public var wrappedValue: String? {
         get {
             do {
-                let item = try Keychain.read(query, options: search)
                 guard
-                    let data = item[kSecValueData.string] as? Data,
+                    let data = try item[kSecValueData.string] as? Data,
                     let password = String(data: data, encoding: .utf8)
                 else {
                     throw KeychainError.unexpectedData(nil)
@@ -52,59 +50,56 @@ public class SecureCredentials {
         set {
             guard let newPassword = newValue else {
                 do {
-                    try Keychain.delete(query)
+                    try delete()
                 } catch {
                     fatalError(error.localizedDescription)
                 }
                 return
             }
-            let attribute: KeychainAttributes = [
-                kSecValueData.string: Data(newPassword.utf8)
-            ]
             
             do {
-                try Keychain.update(attribute, using: query)
+                try update(.password(Data(newPassword.utf8)))
             } catch {
                 fatalError(error.localizedDescription)
             }
         }
     }
     
-    public var projectedValue: SecureCredentials {
+    public var projectedValue: InternetCredentials {
         return self
     }
     
     public init(
+        options: Set<KeychainOption> = .matchFirst,
         label: String? = nil,
-        service: String,
-        account: String? = nil
+        server: String,
+        account: String? = nil,
+        `protocol`: InternetProtocol = .https
     ) {
-        self.label = label ?? service
-        self.service = service
+        self.options = options
+        
+        self.label = label ?? server
+        self.server = server
+        self.protocol = `protocol`
         self._account = account
     }
 }
 
-// MARK: - Queries
-extension SecureCredentials {
+// MARK: - Keychain Queryable
+extension InternetCredentials: KeychainQueryable {
     
-    var query: KeychainQuery {
-        var query: KeychainQuery = [
-            kSecClass.string: kSecClassGenericPassword,
-            kSecAttrLabel.string: label,
-            kSecAttrService.string: service
+    public var attributes: Set<KeychainAttribute> {
+        var attributes: Set<KeychainAttribute> = [
+            .kind(.internet),
+            .label(label),
+            .server(server),
+            .protocol(`protocol`)
         ]
+        
         if let username = _account {
-            query[kSecAttrAccount.string] = username
+            attributes.insert(.account(username))
         }
-        return query
-    }
-    
-    var search: KeychainOptions {
-        [
-            kSecReturnAttributes.string: true,
-            kSecReturnData.string: true,
-            kSecMatchLimit.string: kSecMatchLimitOne
-        ]
+        
+        return attributes
     }
 }
